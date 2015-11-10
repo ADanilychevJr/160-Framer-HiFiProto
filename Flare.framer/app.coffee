@@ -149,13 +149,27 @@ anim = new Animation
 # 		image: "images/tutorial2.png"
 		opacity:0
 	time: 0.25
-
-
 anim.on "end", ->
 #     third.rotationZ = 0 # need to reset to zero so we can animate to 360 again
     third.opacity = 1
     anim.start()
 
+anim2 = new Animation
+	layer: vibrate
+	properties:
+		opacity:0
+	time: 0.5
+anim2.on "end", ->
+    vibrate.opacity = 1
+    anim2.start()
+anim3 = new Animation
+	layer: vibrate2
+	properties:
+		opacity:0
+	time: 0.5
+anim3.on "end", ->
+    vibrate2.opacity = 1
+    anim3.start()
 
 
 
@@ -211,7 +225,13 @@ third.on Events.Click, ->
 		page.scrollX = 2*screensize - 5
 	else if third.states.state == "direction"
 		third.states.switch("turn")
+		anim2.start()
+		anim3.start()
 	else if third.states.state == "turn"
+		anim2.stop()
+		anim3.stop()
+		vibrate.opacity = 0
+		vibrate2.opacity = 0
 		if first.states.state == "gestureoff"
 			third.states.switch("again")
 			anim.stop()
@@ -228,7 +248,13 @@ third.on Events.Click, ->
 		back.opacity = 0
 	else if third.states.state == "again"
 		third.states.switch("turnb")
+		anim2.start()
+		anim3.start()
 	else if third.states.state == "turnb"
+		anim2.stop()
+		anim3.stop()
+		vibrate.opacity = 0
+		vibrate2.opacity = 0
 		if first.states.state == "gestureoff"
 			third.states.switch("arrived")
 			anim.stop()

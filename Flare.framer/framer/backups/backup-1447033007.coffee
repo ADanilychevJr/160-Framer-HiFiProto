@@ -7,7 +7,8 @@ bg = new BackgroundLayer
 mask = new Layer
 	width: 500
 	height: 650
-	image: "images/Frame.png"
+	color: "#ffffff"
+	#image: "images/Frame.png"
 mask.center()
 
 # Create PageComponent
@@ -15,10 +16,10 @@ page = new PageComponent
 	superLayer: mask 
 	width: screensize
 	height: screensize
+	backgroundColor: "#000000"
 # 	scrollHorizontal: false
 	scrollVertical: false
-page.center()	
-
+page.center()
 
 
 
@@ -41,8 +42,10 @@ back = new Layer
 	superLayer: page.content
 	width: screensize
 	height: screensize
-	backgroundColor: "#00ff00"
-	opacity: 1
+	backgroundColor: "#FFA500"
+	#FFA500 orange
+	#00ff00 green
+	opacity: 0
 	x: screensize - 1
 
 direction = new Layer 
@@ -71,10 +74,39 @@ direction.states.add
         # animate this
 	arrived:
 		image: "images/arrived3.png"
-	
 
-	
-	
+third = new Layer 
+	superLayer: page.content
+	width: screensize
+	height: screensize
+	x: 2*screensize - 1
+	backgroundColor: "#000000"
+	opacity: 0
+	image:"images/title2.png"
+third.states.add
+	tutorial:
+        image: "images/tutorial2.png"
+    stateB:
+        x: 200
+        opacity: 1
+
+
+fourth = new Layer 
+	superLayer: page.content
+	width: screensize
+	height: screensize
+	x: 2*screensize - 1
+	backgroundColor: "#000000"
+	opacity: 0
+	image:"images/title2.png"
+third.states.add
+	tutorial:
+        image: "images/tutorial2.png"
+    stateB:
+        x: 200
+        opacity: 1
+
+
 # direction.animate
 # 	properties:
 # 		image: "images/signal1.png"
@@ -132,23 +164,27 @@ direction.on Events.Click, ->
 	else if direction.states.state == "turn"
 		direction.states.switch("signala")
 		anim.start()
+		back.opacity = 1
 	else if direction.states.state == "signala"
 		direction.states.switch("again")
 		anim.stop()
 		direction.opacity = 1
+		back.opacity = 0
 	else if direction.states.state == "again"
 		direction.states.switch("turnb")
 	else if direction.states.state == "turnb"
 		direction.states.switch("signalb")
 		anim.start()
+		back.opacity = 1
 	else if direction.states.state == "signalb"
 		direction.states.switch("arrived")
 		anim.stop()
+		back.opacity = 0
 		direction.opacity = 1
 
 
 # watch frame 
 imageLayer = new Layer
-	width: 500, height: 650
+	width: 500, height: 680
 	image: "images/Frame3.png"
 imageLayer.center()

@@ -1,90 +1,141 @@
 screensize = 425
+white = "#ffffff"
+black = "#000000"
 
 # Set background
 bg = new BackgroundLayer 
-	backgroundColor: "#ffffff"
+	backgroundColor: white
 
+# Mask layer
 mask = new Layer
 	width: 500
 	height: 650
-	image: "images/Frame.png"
+	color: white
+	#image: "images/Frame.png"
 mask.center()
 
-# Create PageComponent
+# watch frame 
+imageLayer = new Layer
+	width: 500, height: 680
+	image: "images/Frame3.png"
+	opacity: 1
+imageLayer.center()
+
+# vibrate animation layer
+vibrate = new Layer
+	width: 128, height: 290
+	rotation: 39
+	opacity: 0
+	x: 50 
+	y: 50
+	image: "images/vibrate5.png"
+vibrate2 = new Layer
+	width: 128, height: 290
+	rotation: 219
+	opacity: 0
+	x: 490 
+	y: 400
+	image: "images/vibrate5.png"
+
+
+
+# Create PageComponent for pagination
 page = new PageComponent
 	superLayer: mask 
 	width: screensize
 	height: screensize
+	backgroundColor: black
 # 	scrollHorizontal: false
 	scrollVertical: false
-page.center()	
+page.center()
 
 
-
-
-# title page
-title = new Layer 
+# First layer
+first = new Layer 
 	superLayer: page.content
 	width: screensize
 	height: screensize
-	backgroundColor: "#000000"
+	backgroundColor: black
 	opacity: 1
 	image:"images/title2.png"
-title.states.add
+first.states.add
 	tutorial:
-        image: "images/tutorial2.png"
-    stateB:
-        x: 200
+        image: "images/tutorial.png"
+    gestureon:
+        image: "images/gestureon.png"
+        opacity: 1
+    gestureoff:
+        image: "images/gestureoff.png"
         opacity: 1
 
+# For animation background
 back = new Layer 
-	superLayer: page.content
 	width: screensize
 	height: screensize
 	backgroundColor: "#FFA500"
 	#FFA500 orange
 	#00ff00 green
 	opacity: 0
-	x: screensize - 1
+	x: 2*screensize - 5
 
-direction = new Layer 
-	superLayer: page.content
+# Second Layer
+second = new Layer 
 	width: screensize
 	height: screensize
-	backgroundColor: "#000000"
+	backgroundColor: black
 	opacity: 1
-	x: screensize - 1
-	image:"images/estimate2.png"
-direction.states.add
+	x: -2000
+	image:"images/main.png"
+
+third = new Layer 
+	width: screensize
+	height: screensize
+	backgroundColor: black
+	opacity: 1
+	x: 3000
+	image:"images/voiceinput.png"
+third.states.add
+	inputted:
+        image: "images/inputted.png"
+    direction:
+    	image: "images/direction3.png"
+third.states.add
     turn:
-        image: "images/turn2.png"
-direction.states.add
+        image: "images/turnright.png"
+third.states.add
 	signala:
         image: "images/signalright.png"
-        # animate this
 	again:
-		image: "images/estimate2.png"
-direction.states.add
+		image: "images/direction4.png"
+third.states.add
     turnb:
-        image: "images/turn3.png" 
-direction.states.add
+        image: "images/turnleft.png" 
+third.states.add
 	signalb:
         image: "images/signalb.png"
-        # animate this
 	arrived:
 		image: "images/arrived3.png"
-	
 
-	
-	
-# direction.animate
+fourth = new Layer
+	width: screensize
+	height: screensize
+	backgroundColor: black
+	opacity: 1
+	x: 3000
+	image:"images/stop.png"
+fourth.states.add
+    done:
+    	image: "images/done.png"
+
+
+# second.animate
 # 	properties:
 # 		image: "images/signal1.png"
 # 		rotationZ: 360
 # 		opacity:0
 # 	time:1
 # 	repeat:100
-# direction.on Events.AnimationEnd, ->
+# second.on Events.AnimationEnd, ->
 #     this.animate
 #         properties:
 # #             image: "images/signal1b.png"
@@ -92,7 +143,7 @@ direction.states.add
 #         time: 1
 
 anim = new Animation
-	layer: direction
+	layer: third
 	properties:
 #         rotationZ: 360
 # 		image: "images/tutorial2.png"
@@ -101,8 +152,8 @@ anim = new Animation
 
 
 anim.on "end", ->
-    direction.rotationZ = 0 # need to reset to zero so we can animate to 360 again
-    direction.opacity = 1
+#     third.rotationZ = 0 # need to reset to zero so we can animate to 360 again
+    third.opacity = 1
     anim.start()
 
 
@@ -123,38 +174,98 @@ page.currentPage.opacity = 1
 # 			opacity: 1
 # 		time: 0.4
 		
-title.on Events.Click, ->
-# 	print "click"
-	title.states.switch("tutorial")
+# show tutorial after title
+first.on Events.Click, ->
+	if first.states.state == "default"
+		first.states.switch("tutorial")
+		second.superLayer = page.content
+		second.x = screensize - 1
+		back.superLayer = page.content
+		third.superLayer = page.content
+		third.x = 2*screensize - 4
 
+# remove tutorial page when swiped
+second.on Events.MouseOver, ->
+	if second.states.state == "default" and first.states.state == "tutorial"
+		first.states.switch("gestureon")
+second.on Events.MouseOut, ->
+	if second.states.state == "default" and first.states.state == "tutorial"
+		first.states.switch("gestureon")
 
-direction.on Events.Click, ->
-	if direction.states.state == "default"
-		direction.states.switch("turn")
-	else if direction.states.state == "turn"
-		direction.states.switch("signala")
-		anim.start()
-		back.opacity = 1
-	else if direction.states.state == "signala"
-		direction.states.switch("again")
+# turn on/off gesture button
+first.on Events.Click, ->
+	if first.states.state == "gestureoff"
+		first.states.switch("gestureon")
+	else if first.states.state == "gestureon"
+		first.states.switch("gestureoff")
+
+# enter destination by voice or phone
+third.on Events.Click, ->
+	if third.states.state == "default"
+		third.states.switch("inputted")
+	else if third.states.state == "inputted"
+		#page.scrolltolayer does not work
+		third.states.switch("direction")
+		fourth.x = 3*screensize - 7
+		fourth.superLayer = page.content
+		page.scrollX = 2*screensize - 5
+	else if third.states.state == "direction"
+		third.states.switch("turn")
+	else if third.states.state == "turn"
+		if first.states.state == "gestureoff"
+			third.states.switch("again")
+			anim.stop()
+			third.opacity = 1
+			back.opacity = 0
+		else
+			third.states.switch("signala")
+			anim.start()
+			back.opacity = 1
+	else if third.states.state == "signala"
+		third.states.switch("again")
 		anim.stop()
-		direction.opacity = 1
+		third.opacity = 1
 		back.opacity = 0
-	else if direction.states.state == "again"
-		direction.states.switch("turnb")
-	else if direction.states.state == "turnb"
-		direction.states.switch("signalb")
-		anim.start()
-		back.opacity = 1
-	else if direction.states.state == "signalb"
-		direction.states.switch("arrived")
+	else if third.states.state == "again"
+		third.states.switch("turnb")
+	else if third.states.state == "turnb"
+		if first.states.state == "gestureoff"
+			third.states.switch("arrived")
+			anim.stop()
+			back.opacity = 0
+			third.opacity = 1
+		else
+			third.states.switch("signalb")
+			anim.start()
+			back.opacity = 1
+	else if third.states.state == "signalb"
+		third.states.switch("arrived")
 		anim.stop()
 		back.opacity = 0
-		direction.opacity = 1
+		third.opacity = 1
+		fourth.states.switch("done")
+		first.superLayer = 0
+		first.x = 2000
+		second.superLayer = 0
+		second.x = 2000
+		page.scrollX = 0
+# 	else if third.states.state == "arrived"
+		# return to second main
 
+# stop direction, back to input
+fourth.on Events.Click, ->
+	# remove fourth
+	fourth.x = 2000
+	fourth.superLayer = 0
+	fourth.states.switch("default")
+	# make third to not inputted
+	third.states.switch("default")
+	# show first
+	first.superLayer = page.content
+	first.x = 0
+	# show second
+	second.superLayer = page.content
+	second.x = screensize - 1
+	# scroll back to third
+	page.scrollX = 2*screensize - 5
 
-# watch frame 
-imageLayer = new Layer
-	width: 500, height: 680
-	image: "images/Frame3.png"
-imageLayer.center()
